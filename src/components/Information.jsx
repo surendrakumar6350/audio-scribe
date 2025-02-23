@@ -41,7 +41,7 @@ export default function Information(props) {
     return () => worker.current.removeEventListener('message', onMessageReceived);
   }, []);
 
-  const textElement = tab === 'transcription' ? output.map(val => val.text) : translation || '';
+  const textElement = tab === 'transcription' || 'translation' ? output.map(val => val.text) : translation || '';
 
   function handleCopy() {
     navigator.clipboard.writeText(textElement);
@@ -51,7 +51,7 @@ export default function Information(props) {
     const element = document.createElement("a");
     const file = new Blob([textElement], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
-    element.download = `FreeScribe_${new Date().toString()}.txt`;
+    element.download = `AudioScribe_${new Date().toString()}.txt`;
     document.body.appendChild(element);
     element.click();
   }

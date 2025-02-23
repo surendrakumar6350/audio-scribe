@@ -125,7 +125,9 @@ const HomePage = ({ setAudioStream, setFile }) => {
           </div>
 
           <p className="text-sm text-gray-500 italic mt-8">
-            Free now, free forever
+            <div className="text-center text-sm text-gray-500 italic">
+              *Note: Our AI model currently supports English language transcription only.
+            </div>
           </p>
         </div>
       </main>

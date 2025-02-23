@@ -7,7 +7,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Mic className="w-8 h-8 text-purple-400" />
-          <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
+          <span onClick={()=> window.location.href = "/"} className="text-2xl font-bold cursor-pointer bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
             Audio<span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Scribe</span>
           </span>
         </div>
