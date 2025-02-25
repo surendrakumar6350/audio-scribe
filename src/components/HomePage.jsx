@@ -86,7 +86,7 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
               </div>
               {loggedIn && !loadingLogIn && user?.name && (
                 <div className="animate-fade-in">
-                  <h2 className="text-4xl md:text-5xl text-gray-100 font-serif mb-8">
+                  <h2 className="text-2xl md:text-3xl text-gray-100 font-serif mb-4">
                     <span className="text-orange-300">✦</span> {getGreeting()}, {user.name}
                   </h2>
                 </div>
