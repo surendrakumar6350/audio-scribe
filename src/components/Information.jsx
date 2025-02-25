@@ -105,7 +105,7 @@ export default function Information(props) {
             </div>
           )}
           {tab === 'transcription' ? (
-            <div className="glass-morphism text-center m-auto p-6 rounded-lg text-gray-200 text-left whitespace-pre-wrap">
+            <div className="glass-morphism text-center m-auto p-6 rounded-lg text-gray-200 whitespace-pre-wrap">
               {textElement}
             </div>
           ) : (
