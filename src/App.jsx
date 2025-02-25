@@ -118,6 +118,9 @@ function App() {
       <Information
         output={output}
         finished={finished}
+        loggedIn={loggedIn}
+        user={user}
+        loadingLogIn={loadingLogIn}
       />
     );
   }
@@ -127,6 +130,9 @@ function App() {
       <Transcribing
         downloading={downloading}
         loading={loading}
+        loggedIn={loggedIn}
+        user={user}
+        loadingLogIn={loadingLogIn}
       />
     );
   }
@@ -138,6 +144,9 @@ function App() {
         file={file}
         audioStream={audioStream}
         handleFormSubmission={handleFormSubmission}
+        loggedIn={loggedIn}
+        user={user}
+        loadingLogIn={loadingLogIn}
       />
     );
   }

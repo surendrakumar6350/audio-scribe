@@ -15,11 +15,8 @@ const Header = ({ loadingLogIn, loggedIn }) => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 ml-10">
           <Mic className="w-8 h-8 text-purple-400" />
-          <span className="text-xl font-semibold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-            Audio
-          </span>
-          <span className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-            Scribe
+          <span onClick={() => window.location.href = "/"} className="text-xl cursor-pointer font-semibold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+            AudioScribe
           </span>
         </div>
 
