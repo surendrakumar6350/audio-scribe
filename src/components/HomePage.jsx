@@ -12,6 +12,13 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
 
   const mimeType = 'audio/webm';
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   async function startRecording() {
     let tempStream;
 
@@ -28,7 +35,7 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
 
     setRecordingStatus('recording');
 
-    const media = new MediaRecorder(tempStream, { type: mimeType });
+    const media = new MediaRecorder(tempStream, { mimeType });
     mediaRecorder.current = media;
     audioChunks.current = [];
 
@@ -64,7 +71,6 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      {/* Add the sidebar component */}
       <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
 
       <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
@@ -78,6 +84,13 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
                   Voice to Text
                 </span>
               </div>
+              {loggedIn && !loadingLogIn && user?.name && (
+                <div className="animate-fade-in">
+                  <h2 className="text-4xl md:text-5xl text-gray-100 font-serif mb-8">
+                    <span className="text-orange-300">✦</span> {getGreeting()}, {user.name}
+                  </h2>
+                </div>
+              )}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
                 Audio<span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">Scribe</span>
               </h1>
