@@ -1,33 +1,20 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    whatsappNumber: {
-      type: String, 
-      required: true,
-      unique: true, 
-      match: /^[\d]{10,15}$/, 
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 2,
-    },
-    promoCode: {
-      type: String,
-      required: false,
-    },
-    inviteCode: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    tradeId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-  }, {
-    timestamps: true,
-  });
-  
+  aud: String,
+  azp: String,
+  email: String,
+  email_verified: Boolean,
+  exp: Number,
+  given_name: String,
+  iat: Number,
+  iss: String,
+  jti: String,
+  name: String,
+  nbf: Number,
+  picture: String,
+  sub: String,
+  date: { type: Date, default: Date.now }
+});
+
 module.exports = mongoose.model('accounts', userSchema);

@@ -1,17 +1,95 @@
 const express = require("express");
+const { jwtDecode } = require("jwt-decode");
 const { connectToDatabase } = require("../models/db/connect");
+const axios = require('axios');
+const accounts = require("../models/accounts");
+require('dotenv').config();
 
 const router = express.Router();
 
 
-router.get("/ping", async (req, res) => {
+router.post("/signup", async (req, res) => {
     try {
-        return res.status(200).json({ success: true, message: "pong!!" });
+        let data = req.body;
+        if (!data || !data.credential) {
+            return res.status(500).json({
+                sucess: false,
+                message: "Bad Request",
+            });
+        }
+        const decoded = jwtDecode(data.credential);
+        data = decoded;
+
+        connectToDatabase();
+        const find = await accounts.findOne({ email: data.email });
+        if (find && find._id) {
+            return res.status(200).json({ success: true, token: find._id });
+        } else {
+            let imageUrl = data.picture;
+            let base64;
+
+            try {
+                const res = await axios.get(imageUrl, {
+                    responseType: "arraybuffer",
+                });
+                const buffer = Buffer.from(res.data, "binary");
+                const base64Image = buffer.toString("base64");
+                base64 = `data:image/jpeg;base64,${base64Image}`;
+            } catch (err) {
+                console.error(err);
+            }
+            const response = new accounts({
+                ...data,
+                picture: base64,
+            });
+            const saveduser = await response.save();
+
+            return res.status(200).json({ success: true, token: saveduser._id });
+        }
     } catch (error) {
-        console.error("Error", error);
-        res.status(500).json({ success: false, message: "An error occurred", error });
+        console.log(error);
+        return res.status(500).json({
+            sucess: false,
+            message: "Bad Request",
+        });
+    }
+})
+
+router.post("/getAccount", async (req, res) => {
+    try {
+        const { _id } = req.body;
+
+        if (!_id) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID (_id) is required",
+            });
+        }
+
+        connectToDatabase();
+        const user = await accounts.findById(_id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
     }
 });
+
 
 
 module.exports = router;
