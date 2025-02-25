@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronDown, Settings, Menu, X } from 'lucide-react';
+import { Settings, Menu, X, Loader } from 'lucide-react';
 
-const ActivitySidebar = ({ activities }) => {
+const ActivitySidebar = ({ loadingLogIn, loggedIn, user }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Default activities if none provided
@@ -28,12 +28,12 @@ const ActivitySidebar = ({ activities }) => {
     }
   ];
 
-  const activityData = activities || defaultActivities;
+  const activityData = defaultActivities;
 
   // Mobile toggle button component
   const MobileToggle = () => (
-    <button 
-      className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-slate-800 text-white" 
+    <button
+      className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-slate-800 text-white"
       onClick={() => setIsOpen(!isOpen)}
     >
       {isOpen ? <X size={20} /> : <Menu size={20} />}
@@ -43,15 +43,15 @@ const ActivitySidebar = ({ activities }) => {
   return (
     <>
       <MobileToggle />
-      
+
       {/* Overlay for mobile - only visible when sidebar is open */}
       {isOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
-      
+
       {/* Sidebar - hidden by default on mobile, shown when isOpen=true */}
       <div className={`
         fixed lg:static inset-y-0 left-0 z-40
@@ -62,25 +62,38 @@ const ActivitySidebar = ({ activities }) => {
       `}>
         <div className="p-4 flex items-center gap-2 border-b border-slate-800">
           <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center">
-            <span className="text-sm">AS</span>
+            {loadingLogIn ? (
+              <Loader className="w-6 h-6 text-gray-300 animate-spin" />
+            ) : loggedIn ? (
+              <img className="w-8 h-8 rounded-full" src={user.picture} alt="User" />
+            ) : (
+              <img className="w-8 h-8 rounded-full" src={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFgG_wbqwD7HVD9FLCyRsz-Rz5DQRgwE8_NQ&s"} alt="User" />
+            )}
+
           </div>
           <span className="font-medium">AudioScribe</span>
         </div>
-        
+
         <div className="flex items-center gap-2 p-3 mx-2 my-2 rounded-lg hover:bg-slate-800 cursor-pointer">
-          <div className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center">
-            <span className="text-xs">AS</span>
+          <div className="w-8 h-8 rounded-full overflow-hidden">
+            {loadingLogIn ? (
+              <Loader className="w-6 h-6 text-gray-300 animate-spin" />
+            ) : loggedIn ? (
+              <img className="w-full h-full object-cover" src={user.picture} alt="User" />
+            ) : (
+              <img className="w-full h-full object-cover" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFgG_wbqwD7HVD9FLCyRsz-Rz5DQRgwE8_NQ&s" alt="User" />
+            )}
           </div>
           <span>AudioScribe</span>
         </div>
-        
+
         <div className="flex items-center gap-2 p-3 mx-2 rounded-lg hover:bg-slate-800 cursor-pointer">
           <div className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center">
             <span className="text-xs">GP</span>
           </div>
           <span>Explore GPTs</span>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto">
           {activityData.map((group) => (
             <div key={group.id} className="mt-6">
@@ -89,8 +102,8 @@ const ActivitySidebar = ({ activities }) => {
               </div>
               <div className="space-y-1">
                 {group.items.map((item) => (
-                  <div 
-                    key={item.id} 
+                  <div
+                    key={item.id}
                     className="px-4 py-2 text-sm hover:bg-slate-800 cursor-pointer"
                     onClick={() => setIsOpen(false)}
                   >
@@ -101,7 +114,7 @@ const ActivitySidebar = ({ activities }) => {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-auto border-t border-slate-800 p-4">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">

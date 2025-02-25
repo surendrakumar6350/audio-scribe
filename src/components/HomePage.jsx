@@ -3,7 +3,7 @@ import { Mic, Upload } from 'lucide-react';
 import Header from './Header';
 import ActivitySidebar from './SideBar';
 
-const HomePage = ({ setAudioStream, setFile, user, loggedIn , loadingLogIn}) => {
+const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => {
   const [recordingStatus, setRecordingStatus] = useState('inactive');
   const [duration, setDuration] = useState(0);
 
@@ -65,10 +65,10 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn , loadingLogIn}) => 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
       {/* Add the sidebar component */}
-      <ActivitySidebar />
-      
+      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
+
       <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
-        <Header user={user} loggedIn={loggedIn}  loadingLogIn={loadingLogIn}/>
+        <Header user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
 
         <main className="flex-1 flex flex-col items-center justify-center px-4 overflow-hidden">
           <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-8 animate-fade-in pt-12 lg:pt-0">
