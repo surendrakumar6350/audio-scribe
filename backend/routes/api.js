@@ -66,7 +66,7 @@ router.post("/getAccount", async (req, res) => {
             });
         }
 
-        connectToDatabase();
+        await connectToDatabase();
         const user = await accounts.findById(_id);
 
         if (!user) {
@@ -99,6 +99,7 @@ router.post('/upload-audio', async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        await connectToDatabase();
         // Create a new Audio document
         const newAudio = new messages({
             userId,
@@ -121,7 +122,8 @@ router.post('/upload-audio', async (req, res) => {
 router.get('/audio/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-        const audioFiles = await messages.find({ userId });
+        await connectToDatabase();
+        const audioFiles = await messages.find({ userId }, { audioBase64: 0 }).sort({ uploadedAt: -1 }).limit(20);
 
         if (!audioFiles.length) {
             return res.status(404).json({ error: 'No audio files found for this user' });
@@ -130,7 +132,7 @@ router.get('/audio/:userId', async (req, res) => {
         res.json(audioFiles);
     } catch (error) {
         console.error('Error fetching audio:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error', message: error });
     }
 });
 

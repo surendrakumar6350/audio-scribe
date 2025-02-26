@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Upload } from 'lucide-react';
 import Header from './Header';
 import ActivitySidebar from './SideBar';
+import { message } from 'react-message-popup'
 
 const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setResultAudioBase64, refreshActivities }) => {
   const [recordingStatus, setRecordingStatus] = useState('inactive');
@@ -71,6 +72,28 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setRe
     };
   }
 
+  const handleFileUpload = (file) => {
+    if (!user) {
+      return message.error('Please Login First', 4000);
+    }
+    if (!file) return;
+
+    setFile(file);
+
+    // Convert the uploaded file to base64
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      const base64Audio = reader.result;
+      if (base64Audio) {
+        setResultAudioBase64(base64Audio);
+      } else {
+        console.log("Error: Base64 conversion failed for uploaded file");
+      }
+    };
+  };
+
+
   useEffect(() => {
     if (recordingStatus === 'inactive') return;
 
@@ -83,7 +106,7 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setRe
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} refreshActivities={refreshActivities}/>
+      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} refreshActivities={refreshActivities} />
 
       <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
         <Header user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
@@ -137,13 +160,20 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setRe
 
               <div className="flex items-center justify-center gap-2 text-gray-400">
                 <span>or</span>
-                <label className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors duration-200 cursor-pointer group">
+                <label onClick={() => {
+                  if (!user) {
+                    return message.error('Please Login First', 4000);
+                  }
+                }} className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors duration-200 cursor-pointer group">
                   <span className="group-hover:underline">upload a file</span>
                   <Upload className="w-4 h-4" />
                   <input
+                    disabled={user ? false : true}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) setFile(file);
+                      if (file) {
+                        handleFileUpload(file);
+                      }
                     }}
                     className="hidden"
                     type="file"
