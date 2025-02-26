@@ -16,6 +16,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loadingLogIn, setLoadingLogIn] = useState(true);
   const [user, setUser] = useState();
+  const [resultaudioBase64, setResultAudioBase64] = useState(null);
+  const [resultToSent, setResultToSent] = useState();
 
   const isAudioAvailable = file || audioStream;
 
@@ -29,6 +31,22 @@ function App() {
   }
 
   const worker = useRef(null);
+
+  useEffect(() => {
+    if (resultToSent) {
+      (async () => {
+        const userId = localStorage.getItem("token");
+        if (!user || !userId) {
+          return console.log("please login...");
+        }
+        if (!resultaudioBase64) return;
+        await axios.post(`${BACKEND_URL}/v1/upload-audio`, {
+          userId, name: user.name, audioBase64: resultaudioBase64,
+          transcription: resultToSent.textElement, title: resultToSent.title
+        });
+      })()
+    }
+  }, [resultToSent])
 
 
   const fetchUser = async () => {
@@ -121,6 +139,7 @@ function App() {
         loggedIn={loggedIn}
         user={user}
         loadingLogIn={loadingLogIn}
+        setResultToSent={setResultToSent}
       />
     );
   }
@@ -158,6 +177,7 @@ function App() {
       loggedIn={loggedIn}
       user={user}
       loadingLogIn={loadingLogIn}
+      setResultAudioBase64={setResultAudioBase64}
     />
   );
 }

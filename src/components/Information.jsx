@@ -3,9 +3,10 @@ import { Copy, Download, Loader2 } from 'lucide-react';
 import Translation from '../components/Translation';
 import Header from '../components/Header';
 import ActivitySidebar from '../components/SideBar';
+import generateShortTitle from '../utils/generateTitle';
 
 export default function Information(props) {
-  const { output, finished, user, loadingLogIn, loggedIn } = props;
+  const { output, finished, user, loadingLogIn, loggedIn, setResultToSent } = props;
   const [tab, setTab] = useState('transcription');
   const [translation, setTranslation] = useState(null);
   const [toLanguage, setToLanguage] = useState('Select language');
@@ -38,6 +39,9 @@ export default function Information(props) {
     };
 
     worker.current.addEventListener('message', onMessageReceived);
+    const title = generateShortTitle(textElement[0])
+    setResultToSent({ title: title, textElement: textElement })
+
     return () => worker.current.removeEventListener('message', onMessageReceived);
   }, []);
 

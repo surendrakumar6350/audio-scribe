@@ -3,8 +3,8 @@ const { jwtDecode } = require("jwt-decode");
 const { connectToDatabase } = require("../models/db/connect");
 const axios = require('axios');
 const accounts = require("../models/accounts");
+const messages = require("../models/messages")
 require('dotenv').config();
-
 const router = express.Router();
 
 
@@ -87,6 +87,50 @@ router.post("/getAccount", async (req, res) => {
             success: false,
             message: "Internal Server Error",
         });
+    }
+});
+
+router.post('/upload-audio', async (req, res) => {
+    try {
+        const { userId, name, audioBase64, transcription, title } = req.body;
+
+        // Validation
+        if (!userId || !name || !audioBase64 || !title) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Create a new Audio document
+        const newAudio = new messages({
+            userId,
+            name,
+            audioBase64,
+            transcription: transcription || '', // Default empty if not provided
+            title,
+        });
+
+        // Save to database
+        await newAudio.save();
+
+        res.status(201).json({ message: 'Audio uploaded successfully', audioId: newAudio._id });
+    } catch (error) {
+        console.error('Error saving audio:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/audio/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const audioFiles = await messages.find({ userId });
+
+        if (!audioFiles.length) {
+            return res.status(404).json({ error: 'No audio files found for this user' });
+        }
+
+        res.json(audioFiles);
+    } catch (error) {
+        console.error('Error fetching audio:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 

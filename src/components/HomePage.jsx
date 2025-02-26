@@ -3,7 +3,7 @@ import { Mic, Upload } from 'lucide-react';
 import Header from './Header';
 import ActivitySidebar from './SideBar';
 
-const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => {
+const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setResultAudioBase64 }) => {
   const [recordingStatus, setRecordingStatus] = useState('inactive');
   const [duration, setDuration] = useState(0);
 
@@ -55,6 +55,18 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn }) => 
     mediaRecorder.current.onstop = () => {
       const audioBlob = new Blob(audioChunks.current, { type: mimeType });
       setAudioStream(audioBlob);
+
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = () => {
+        const base64Audio = reader.result;
+        if (base64Audio) {
+          setResultAudioBase64(base64Audio);
+        } else {
+          console.log("Error: Base64 conversion failed");
+        }
+      };
+
       setDuration(0);
     };
   }
