@@ -81,7 +81,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
       formattedData.push({
         id: 1,
         category: 'Today',
-        items: todayItems.reverse()
+        items: todayItems
       });
     }
 
@@ -89,7 +89,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
       formattedData.push({
         id: 2,
         category: 'Yesterday',
-        items: yesterdayItems.reverse()
+        items: yesterdayItems
       });
     }
 
@@ -97,7 +97,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
       formattedData.push({
         id: 3,
         category: 'Older',
-        items: olderItems.reverse()
+        items: olderItems
       });
     }
 
