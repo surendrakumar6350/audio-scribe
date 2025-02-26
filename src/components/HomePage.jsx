@@ -3,7 +3,7 @@ import { Mic, Upload } from 'lucide-react';
 import Header from './Header';
 import ActivitySidebar from './SideBar';
 
-const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setResultAudioBase64 }) => {
+const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setResultAudioBase64, refreshActivities }) => {
   const [recordingStatus, setRecordingStatus] = useState('inactive');
   const [duration, setDuration] = useState(0);
 
@@ -83,7 +83,7 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setRe
 
   return (
     <div className="flex h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
+      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} refreshActivities={refreshActivities}/>
 
       <div className="flex-1 flex flex-col w-full h-screen overflow-hidden">
         <Header user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />

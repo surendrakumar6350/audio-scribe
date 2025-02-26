@@ -6,7 +6,7 @@ import ActivitySidebar from '../components/SideBar';
 import generateShortTitle from '../utils/generateTitle';
 
 export default function Information(props) {
-  const { output, finished, user, loadingLogIn, loggedIn, setResultToSent } = props;
+  const { output, finished, user, loadingLogIn, loggedIn, setResultToSent, refreshActivities } = props;
   const [tab, setTab] = useState('transcription');
   const [translation, setTranslation] = useState(null);
   const [toLanguage, setToLanguage] = useState('Select language');
@@ -73,7 +73,7 @@ export default function Information(props) {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
+      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} refreshActivities={refreshActivities} />
 
       <div className="flex-1 flex flex-col h-full overflow-y-auto">
         <Header user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />

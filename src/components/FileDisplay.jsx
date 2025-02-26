@@ -10,7 +10,8 @@ const FileDisplay = ({
   handleFormSubmission,
   user,
   loggedIn,
-  loadingLogIn
+  loadingLogIn,
+  refreshActivities
 }) => {
   const audioRef = useRef(null);
 
@@ -28,7 +29,7 @@ const FileDisplay = ({
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800">
-      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />
+      <ActivitySidebar user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} refreshActivities={refreshActivities} />
 
       <div className="flex-1 flex flex-col h-full">
         <Header user={user} loggedIn={loggedIn} loadingLogIn={loadingLogIn} />

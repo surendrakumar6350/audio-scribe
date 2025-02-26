@@ -18,6 +18,7 @@ function App() {
   const [user, setUser] = useState();
   const [resultaudioBase64, setResultAudioBase64] = useState(null);
   const [resultToSent, setResultToSent] = useState();
+  const [refreshActivities, setRefreshActivites] = useState(true);
 
   const isAudioAvailable = file || audioStream;
 
@@ -44,6 +45,7 @@ function App() {
           userId, name: user.name, audioBase64: resultaudioBase64,
           transcription: resultToSent.textElement, title: resultToSent.title
         });
+        setRefreshActivites((pre) => !pre)
       })()
     }
   }, [resultToSent])
@@ -140,6 +142,7 @@ function App() {
         user={user}
         loadingLogIn={loadingLogIn}
         setResultToSent={setResultToSent}
+        refreshActivities={refreshActivities}
       />
     );
   }
@@ -152,6 +155,7 @@ function App() {
         loggedIn={loggedIn}
         user={user}
         loadingLogIn={loadingLogIn}
+        refreshActivities={refreshActivities}
       />
     );
   }
@@ -166,6 +170,7 @@ function App() {
         loggedIn={loggedIn}
         user={user}
         loadingLogIn={loadingLogIn}
+        refreshActivities={refreshActivities}
       />
     );
   }
@@ -178,6 +183,7 @@ function App() {
       user={user}
       loadingLogIn={loadingLogIn}
       setResultAudioBase64={setResultAudioBase64}
+      refreshActivities={refreshActivities}
     />
   );
 }

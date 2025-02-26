@@ -1,34 +1,114 @@
 import React, { useState } from 'react';
 import { Settings, Menu, X, Loader } from 'lucide-react';
+import { BACKEND_URL } from '../../constants/constants'
+import { useEffect } from 'react';
+import axios from 'axios';
 
-const ActivitySidebar = ({ loadingLogIn, loggedIn, user }) => {
+const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [audioData, setAudioData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUserAudio = async () => {
+      const userId = localStorage.getItem("token");
+      if (!user || !userId) {
+        return console.log("please login...");
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${BACKEND_URL}/v1/audio/${userId}`);
+        setAudioData(response.data);
+      } catch (error) {
+        console.error("Error fetching audio data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (loggedIn) {
+      fetchUserAudio();
+    }
+  }, [user, loggedIn, refreshActivities]);
+
+  // Format backend data into the structure needed for the sidebar
+  const formatAudioData = (data) => {
+    if (!data || data.length === 0) {
+      return defaultActivities;
+    }
+
+    // Group data by date (Today, Yesterday, Older)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const todayItems = [];
+    const yesterdayItems = [];
+    const olderItems = [];
+
+    data.forEach(audio => {
+      const uploadDate = new Date(audio.uploadedAt);
+      uploadDate.setHours(0, 0, 0, 0);
+
+      // Use title from transcription if available, otherwise use a default title
+      const title = audio.title !== "[BLANK_AUDIO]" ?
+        audio.title :
+        audio.transcription[0] !== "[BLANK_AUDIO]" ?
+          audio.transcription[0].substring(0, 30) + (audio.transcription[0].length > 30 ? "..." : "") :
+          "Untitled Audio";
+
+      const item = {
+        id: audio._id,
+        title: title,
+        audioData: audio // Store the full audio data for later use if needed
+      };
+
+      if (uploadDate.getTime() === today.getTime()) {
+        todayItems.push(item);
+      } else if (uploadDate.getTime() === yesterday.getTime()) {
+        yesterdayItems.push(item);
+      } else {
+        olderItems.push(item);
+      }
+    });
+
+    const formattedData = [];
+
+    if (todayItems.length > 0) {
+      formattedData.push({
+        id: 1,
+        category: 'Today',
+        items: todayItems
+      });
+    }
+
+    if (yesterdayItems.length > 0) {
+      formattedData.push({
+        id: 2,
+        category: 'Yesterday',
+        items: yesterdayItems
+      });
+    }
+
+    if (olderItems.length > 0) {
+      formattedData.push({
+        id: 3,
+        category: 'Older',
+        items: olderItems
+      });
+    }
+
+    return formattedData.length > 0 ? formattedData : defaultActivities;
+  };
 
   // Default activities if none provided
-  const defaultActivities = [
-    {
-      id: 1,
-      category: 'Today',
-      items: [
-        { id: 'a1', title: 'IAM Role Deployment Fix' },
-        { id: 'a2', title: 'Admin Panel Button Issue' }
-      ]
-    },
-    {
-      id: 2,
-      category: 'Yesterday',
-      items: [
-        { id: 'b1', title: 'Get URL Search Params' },
-        { id: 'b2', title: 'PWA Install Button Popup' },
-        { id: 'b3', title: 'Vaul library explanation' },
-        { id: 'b4', title: 'AWS credentials issue' },
-        { id: 'b5', title: 'PWA Manifest Optimization' },
-        { id: 'b6', title: 'PWA Install Button React' }
-      ]
-    }
-  ];
+  const defaultActivities = [];
 
-  const activityData = defaultActivities;
+  // Use formatted data or default data
+  const activityData = formatAudioData(audioData);
 
   // Mobile toggle button component
   const MobileToggle = () => (
@@ -99,24 +179,30 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user }) => {
 
         {/* Scrollable Activity Section */}
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          {activityData.map((group) => (
-            <div key={group.id} className="mt-6">
-              <div className="px-4 py-2 text-xs font-medium text-slate-400">
-                {group.category}
-              </div>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="px-4 py-2 text-sm hover:bg-slate-800 cursor-pointer transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.title}
-                  </div>
-                ))}
-              </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+              <Loader className="w-6 h-6 text-slate-400 animate-spin" />
             </div>
-          ))}
+          ) : (
+            activityData.map((group) => (
+              <div key={group.id} className="mt-6">
+                <div className="px-4 py-2 text-xs font-medium text-slate-400">
+                  {group.category}
+                </div>
+                <div className="space-y-1">
+                  {group.items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="px-4 py-2 text-sm hover:bg-slate-800 cursor-pointer transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.title}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Footer Section */}
