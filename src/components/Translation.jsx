@@ -1,11 +1,30 @@
+/**
+ * Translation Component
+ * 
+ * This component provides translation functionality using the Google Translate API.
+ * It allows users to select a target language and translate text from any source language.
+ * 
+ * @param {Object} props - Component props
+ * @param {string} props.toLanguage - The target language code for translation
+ * @param {boolean} props.translating - Flag indicating if translation is in progress
+ * @param {string|string[]} props.textElement - The text to be translated
+ * @param {Function} props.setToLanguage - Function to update the target language
+ */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export default function Translation(props) {
+  // Destructure props for easier access
   const { toLanguage, translating, textElement, setToLanguage } = props;
+  // State to store available languages from the API
   const [languages, setLanguages] = useState([]);
+  // State to store the translated text result
   const [translatedText, setTranslatedText] = useState('');
 
+  /**
+   * Effect hook to fetch available languages when component mounts
+   * Makes an API call to get all supported languages for translation
+   */
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
@@ -27,9 +46,16 @@ export default function Translation(props) {
     fetchLanguages();
   }, []);
 
+  /**
+   * Function to handle the translation process
+   * Makes an API call to translate the provided text to the selected language
+   * Truncates text if it exceeds the API length limit
+   */
   const translateText = async () => {
+    // Return early if no text or target language is provided
     if (!textElement || !toLanguage) return;
 
+    // Truncate text to avoid API limitations (maximum character limit)
     const truncatedText = typeof textElement === 'string'
       ? textElement.slice(0, 1037299)
       : textElement.join(' ').slice(0, 1037299);
@@ -43,8 +69,8 @@ export default function Translation(props) {
         'Content-Type': 'application/json'
       },
       data: {
-        from: 'auto',
-        to: toLanguage,
+        from: 'auto', // Auto-detect source language
+        to: toLanguage, // Target language selected by user
         text: truncatedText
       }
     };
@@ -57,8 +83,13 @@ export default function Translation(props) {
     }
   };
 
+  /**
+   * Component UI rendering
+   * Includes language selector dropdown, translate button, and results display area
+   */
   return (
     <div className="flex flex-col gap-4">
+      {/* Language selection and translation controls */}
       <div className="flex flex-col gap-2">
         <select
           value={toLanguage}
@@ -85,6 +116,7 @@ export default function Translation(props) {
           Translate
         </button>
       </div>
+      {/* Translation results display area */}
       <div className="bg-white p-4 rounded-lg shadow min-h-[100px]">
         {translatedText || 'Translation will appear here...'}
       </div>

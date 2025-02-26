@@ -4,11 +4,21 @@ import { BACKEND_URL } from '../../constants/constants'
 import { useEffect } from 'react';
 import axios from 'axios';
 
+// ActivitySidebar component displays user activities and navigation options
+// Props:
+// - loadingLogIn: boolean indicating if user authentication is in progress
+// - loggedIn: boolean indicating if user is authenticated
+// - user: object containing user information including profile picture
+// - refreshActivities: trigger to refresh the activities list
 const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) => {
+  // State for mobile sidebar visibility
   const [isOpen, setIsOpen] = useState(false);
+  // State for storing audio data from backend
   const [audioData, setAudioData] = useState([]);
+  // State for tracking data loading state
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch user's audio data when component mounts or when dependencies change
   useEffect(() => {
     const fetchUserAudio = async () => {
       const userId = localStorage.getItem("token");
@@ -32,7 +42,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
     }
   }, [user, loggedIn, refreshActivities]);
 
-  // Format backend data into the structure needed for the sidebar
+  // Formats raw audio data into categorized sections (Today, Yesterday, Older)
   const formatAudioData = (data) => {
     if (!data || data.length === 0) {
       return defaultActivities;
@@ -48,11 +58,12 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
     let yesterdayItems = [];
     let olderItems = [];
   
+    // Categorize each audio item based on upload date
     data.forEach(audio => {
       const uploadDate = new Date(audio.uploadedAt);
       uploadDate.setHours(0, 0, 0, 0);
   
-      // Generate a proper title
+      // Generate title from audio data or transcription
       const title = audio.title !== "[BLANK_AUDIO]" 
         ? audio.title 
         : audio.transcription[0] !== "[BLANK_AUDIO]" 
@@ -65,6 +76,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
         audioData: audio
       };
   
+      // Sort items into appropriate time categories
       if (uploadDate.getTime() === today.getTime()) {
         todayItems.push(item);
       } else if (uploadDate.getTime() === yesterday.getTime()) {
@@ -74,10 +86,10 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
       }
     });
   
-    // Prioritize the latest 20 records from today and yesterday first
+    // Limit to latest 20 records while maintaining chronological order
     let allItems = [...todayItems, ...yesterdayItems, ...olderItems].slice(0, 20);
   
-    // Regroup after slicing to maintain section structure
+    // Regroup items into their respective categories
     let groupedData = [];
     
     if (allItems.some(item => todayItems.includes(item))) {
@@ -107,14 +119,13 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
     return groupedData.length > 0 ? groupedData : defaultActivities;
   };
   
-
-  // Default activities if none provided
+  // Default empty activities array when no data is available
   const defaultActivities = [];
 
-  // Use formatted data or default data
+  // Process the audio data for display
   const activityData = formatAudioData(audioData);
 
-  // Mobile toggle button component
+  // Mobile toggle button component for showing/hiding sidebar
   const MobileToggle = () => (
     <button
       className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-slate-800 text-white hover:bg-slate-700 transition-colors"
@@ -126,9 +137,10 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
 
   return (
     <>
+      {/* Mobile menu toggle button */}
       <MobileToggle />
 
-      {/* Overlay for mobile - only visible when sidebar is open */}
+      {/* Mobile overlay - darkens the background when sidebar is open */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 backdrop-blur-sm"
@@ -136,7 +148,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
         />
       )}
 
-      {/* Sidebar - hidden by default on mobile, shown when isOpen=true */}
+      {/* Main sidebar component */}
       <aside className={`
         fixed lg:sticky top-0 left-0 z-40
         w-64 h-screen bg-slate-950 text-white border-r border-slate-800
@@ -145,7 +157,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
         ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
         lg:translate-x-0
       `}>
-        {/* Header */}
+        {/* Sidebar header with app logo/name */}
         <div className="shrink-0 p-4 flex items-center gap-2 border-b border-slate-800">
           <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center">
             {loadingLogIn ? (
@@ -159,7 +171,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
           <span className="font-medium">AudioScribe</span>
         </div>
 
-        {/* User Profile Section */}
+        {/* User profile section */}
         <div className="shrink-0 flex items-center gap-2 p-3 mx-2 my-2 rounded-lg hover:bg-slate-800 cursor-pointer">
           <div className="w-8 h-8 rounded-full overflow-hidden">
             {loadingLogIn ? (
@@ -173,7 +185,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
           <span>AudioScribe</span>
         </div>
 
-        {/* GPT Section */}
+        {/* GPT exploration section */}
         <div className="shrink-0 flex items-center gap-2 p-3 mx-2 rounded-lg hover:bg-slate-800 cursor-pointer">
           <div className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center">
             <span className="text-xs">GP</span>
@@ -181,7 +193,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
           <span>Explore GPTs</span>
         </div>
 
-        {/* Scrollable Activity Section */}
+        {/* Scrollable activities list */}
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {isLoading ? (
             <div className="flex justify-center items-center h-40">
@@ -209,7 +221,7 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
           )}
         </div>
 
-        {/* Footer Section */}
+        {/* Footer with upgrade plan option and settings */}
         <div className="shrink-0 mt-auto border-t border-slate-800 p-4">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
