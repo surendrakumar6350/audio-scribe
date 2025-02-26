@@ -21,6 +21,7 @@ const HomePage = ({ setAudioStream, setFile, user, loggedIn, loadingLogIn, setRe
   };
 
   async function startRecording() {
+    if (!user) return message.error('Please Login First', 4000);
     let tempStream;
 
     try {

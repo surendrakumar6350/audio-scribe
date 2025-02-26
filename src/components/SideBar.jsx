@@ -37,35 +37,34 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
     if (!data || data.length === 0) {
       return defaultActivities;
     }
-
-    // Group data by date (Today, Yesterday, Older)
+  
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
+  
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-
-    const todayItems = [];
-    const yesterdayItems = [];
-    const olderItems = [];
-
+  
+    let todayItems = [];
+    let yesterdayItems = [];
+    let olderItems = [];
+  
     data.forEach(audio => {
       const uploadDate = new Date(audio.uploadedAt);
       uploadDate.setHours(0, 0, 0, 0);
-
-      // Use title from transcription if available, otherwise use a default title
-      const title = audio.title !== "[BLANK_AUDIO]" ?
-        audio.title :
-        audio.transcription[0] !== "[BLANK_AUDIO]" ?
-          audio.transcription[0].substring(0, 30) + (audio.transcription[0].length > 30 ? "..." : "") :
-          "Untitled Audio";
-
+  
+      // Generate a proper title
+      const title = audio.title !== "[BLANK_AUDIO]" 
+        ? audio.title 
+        : audio.transcription[0] !== "[BLANK_AUDIO]" 
+          ? audio.transcription[0].substring(0, 30) + (audio.transcription[0].length > 30 ? "..." : "") 
+          : "Untitled Audio";
+  
       const item = {
         id: audio._id,
         title: title,
-        audioData: audio // Store the full audio data for later use if needed
+        audioData: audio
       };
-
+  
       if (uploadDate.getTime() === today.getTime()) {
         todayItems.push(item);
       } else if (uploadDate.getTime() === yesterday.getTime()) {
@@ -74,35 +73,40 @@ const ActivitySidebar = ({ loadingLogIn, loggedIn, user, refreshActivities }) =>
         olderItems.push(item);
       }
     });
-
-    const formattedData = [];
-
-    if (todayItems.length > 0) {
-      formattedData.push({
+  
+    // Prioritize the latest 20 records from today and yesterday first
+    let allItems = [...todayItems, ...yesterdayItems, ...olderItems].slice(0, 20);
+  
+    // Regroup after slicing to maintain section structure
+    let groupedData = [];
+    
+    if (allItems.some(item => todayItems.includes(item))) {
+      groupedData.push({
         id: 1,
         category: 'Today',
-        items: todayItems
+        items: allItems.filter(item => todayItems.includes(item)).reverse()
       });
     }
-
-    if (yesterdayItems.length > 0) {
-      formattedData.push({
+  
+    if (allItems.some(item => yesterdayItems.includes(item))) {
+      groupedData.push({
         id: 2,
         category: 'Yesterday',
-        items: yesterdayItems
+        items: allItems.filter(item => yesterdayItems.includes(item)).reverse()
       });
     }
-
-    if (olderItems.length > 0) {
-      formattedData.push({
+  
+    if (allItems.some(item => olderItems.includes(item))) {
+      groupedData.push({
         id: 3,
         category: 'Older',
-        items: olderItems
+        items: allItems.filter(item => olderItems.includes(item)).reverse()
       });
     }
-
-    return formattedData.length > 0 ? formattedData : defaultActivities;
+  
+    return groupedData.length > 0 ? groupedData : defaultActivities;
   };
+  
 
   // Default activities if none provided
   const defaultActivities = [];

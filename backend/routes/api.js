@@ -123,7 +123,7 @@ router.get('/audio/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
         await connectToDatabase();
-        const audioFiles = await messages.find({ userId }, { audioBase64: 0 }).sort({ uploadedAt: -1 }).limit(20);
+        const audioFiles = await messages.find({ userId }, { audioBase64: 0 }).sort({ uploadedAt: 1 }).limit(20);
 
         if (!audioFiles.length) {
             return res.status(404).json({ error: 'No audio files found for this user' });
