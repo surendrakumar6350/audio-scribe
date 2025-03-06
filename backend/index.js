@@ -1,27 +1,32 @@
 /**
- * This file is only for deployment.
- * Deployment is handled exclusively using serverless.
- * 
- * Main server configuration for a serverless Express application
+ * Main server configuration for a standard Node.js Express application
  * This file sets up the Express application with middleware, routes, and error handling.
  */
-const serverless = require("serverless-http");
 const express = require("express");
 const app = express();
 require('dotenv').config();  // Load environment variables from .env file
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const allApis = require('./routes/api');  // Import all API routes
-const {limiter} = require('./utils/limiter');  // Rate limiting middleware
-const { corsOptions } = require('./utils/corsOptions')  // CORS configuration
+const { limiter } = require('./utils/limiter');  // Rate limiting middleware
+const { corsOptions } = require('./utils/corsOptions');  // CORS configuration
+
+const PORT = process.env.PORT || 4000; // Set the port
 
 /**
  * Configure the application to trust the proxy when running behind a reverse proxy
  * This is important for correct IP address determination for rate limiting
  */
 app.set('trust proxy', function (ip) {
-  return ip === '127.0.0.1';
+    return ip === '127.0.0.1';
 });
+
+/**
+ * Enable CORS (Cross-Origin Resource Sharing) pre-flight requests
+ * This allows browsers to make requests to this API from different origins
+ */
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 /**
  * Configure body-parser middleware for handling JSON and URL-encoded data
@@ -29,12 +34,6 @@ app.set('trust proxy', function (ip) {
  */
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-
-/**
- * Enable CORS (Cross-Origin Resource Sharing) pre-flight requests
- * This allows browsers to make requests to this API from different origins
- */
-app.options('*', cors(corsOptions));
 
 /**
  * Apply rate limiting middleware to prevent abuse
@@ -48,9 +47,9 @@ app.use(limiter);
  * @returns {Object} 200 - Success response with a message
  */
 app.get("/", (req, res, next) => {
-  return res.status(200).json({
-    message: "Hello! Sever is Running...",
-  });
+    return res.status(200).json({
+        message: "Hello! Server is Running...",
+    });
 });
 
 /**
@@ -64,13 +63,14 @@ app.use('/v1', allApis);
  * This catches any requests that don't match defined routes
  */
 app.use((req, res, next) => {
-  return res.status(404).json({
-    error: "Not Found",
-  });
+    return res.status(404).json({
+        error: "Not Found",
+    });
 });
 
 /**
- * Export the Express app wrapped with serverless-http
- * This allows the app to run in serverless environments like AWS Lambda
+ * Start the Express server
  */
-exports.handler = serverless(app);
+app.listen(PORT, () => {
+    console.log(`Backend Server is running ....`);
+});

@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "dev": "serverless offline start",
+        "dev": "node index.js",
         "update": "serverless deploy"
     },
     "dependencies": {
