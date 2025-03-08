@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Download, Loader2 } from 'lucide-react';
-import Translation from '../components/Translation';
+import Translation from './translation/Translation';
 import TextToSpeech from '../components/TextToSpeech';
 import Header from '../components/Header';
 import ActivitySidebar from '../components/SideBar';
