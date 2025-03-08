@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Download, Loader2 } from 'lucide-react';
 import Translation from '../components/Translation';
+import TextToSpeech from '../components/TextToSpeech';
 import Header from '../components/Header';
 import ActivitySidebar from '../components/SideBar';
 import generateShortTitle from '../utils/generateTitle';
 
-// Main Information component displays transcription and translation results
+// Main Information component displays transcription, translation, and text-to-speech results
 // Props:
 // - output: Array of transcription segments
 // - finished: Boolean indicating if processing is complete
@@ -16,7 +17,7 @@ import generateShortTitle from '../utils/generateTitle';
 // - refreshActivities: Function to refresh sidebar activities
 export default function Information(props) {
   const { output, finished, user, loadingLogIn, loggedIn, setResultToSent, refreshActivities } = props;
-  // State for managing active tab (transcription/translation)
+  // State for managing active tab (transcription/translation/text-to-speech)
   const [tab, setTab] = useState('transcription');
   // State for storing translated text
   const [translation, setTranslation] = useState(null);
@@ -109,9 +110,9 @@ export default function Information(props) {
             Your <span className='bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400'>Transcription</span>
           </h1>
 
-          {/* Tab switcher between transcription and translation */}
+          {/* Tab switcher between transcription, translation, and text-to-speech */}
           <div className='w-full max-w-md mx-auto glass-morphism p-1 rounded-lg'>
-            <div className='grid grid-cols-2 gap-1'>
+            <div className='grid grid-cols-3 gap-1'>
               <button
                 onClick={() => setTab('transcription')}
                 className={`px-4 rounded-md duration-200 py-2 font-medium ${tab === 'transcription'
@@ -130,23 +131,33 @@ export default function Information(props) {
               >
                 Translation
               </button>
+              <button
+                onClick={() => setTab('text-to-speech')}
+                className={`px-4 rounded-md duration-200 py-2 font-medium ${tab === 'text-to-speech'
+                  ? 'bg-purple-500/20 text-purple-400'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                Text to Speech
+              </button>
             </div>
           </div>
 
-          {/* Content area for transcription/translation */}
+          {/* Content area for transcription/translation/text-to-speech */}
           <div className='my-8 flex flex-col-reverse w-full gap-4'>
             {/* Loading indicator */}
-            {(!finished || translating) && (
+            {(!finished || translating) && tab !== 'text-to-speech' && (
               <div className='grid place-items-center'>
                 <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
               </div>
             )}
-            {/* Display either transcription or translation component */}
+
+            {/* Display content based on active tab */}
             {tab === 'transcription' ? (
               <div className="glass-morphism text-center m-auto p-6 rounded-lg text-gray-200 whitespace-pre-wrap">
                 {textElement}
               </div>
-            ) : (
+            ) : tab === 'translation' ? (
               <Translation
                 toLanguage={toLanguage}
                 translating={translating}
@@ -156,26 +167,32 @@ export default function Information(props) {
                 setToLanguage={setToLanguage}
                 generateTranslation={generateTranslation}
               />
+            ) : (
+              <TextToSpeech
+                textContent={typeof textElement === 'object' ? textElement.join(' ') : textElement}
+              />
             )}
           </div>
 
-          {/* Action buttons for copy and download */}
-          <div className='flex items-center gap-4'>
-            <button
-              onClick={handleCopy}
-              title="Copy"
-              className='specialBtn p-3 rounded-lg hover:scale-105 transition-all duration-200'
-            >
-              <Copy className="w-5 h-5 text-purple-400" />
-            </button>
-            <button
-              onClick={handleDownload}
-              title="Download"
-              className='specialBtn p-3 rounded-lg hover:scale-105 transition-all duration-200'
-            >
-              <Download className="w-5 h-5 text-purple-400" />
-            </button>
-          </div>
+          {/* Action buttons for copy and download - only show for transcription and translation */}
+          {tab !== 'text-to-speech' && (
+            <div className='flex items-center gap-4'>
+              <button
+                onClick={handleCopy}
+                title="Copy"
+                className='specialBtn p-3 rounded-lg hover:scale-105 transition-all duration-200'
+              >
+                <Copy className="w-5 h-5 text-purple-400" />
+              </button>
+              <button
+                onClick={handleDownload}
+                title="Download"
+                className='specialBtn p-3 rounded-lg hover:scale-105 transition-all duration-200'
+              >
+                <Download className="w-5 h-5 text-purple-400" />
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>

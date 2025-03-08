@@ -32,8 +32,8 @@ export default function Translation(props) {
           method: 'GET',
           url: 'https://google-translate113.p.rapidapi.com/api/v1/translator/support-languages',
           headers: {
-            'x-rapidapi-key': 'c653844f29mshb76f19ec161e2c7p113f73jsncaafc098a089',
-            'x-rapidapi-host': 'google-translate113.p.rapidapi.com',
+            'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_GOOGLE_TRANSLATE_KEY,
+            'x-rapidapi-host': import.meta.env.VITE_RAPIDAPI_GOOGLE_TRANSLATE_HOST
           },
         };
         const response = await axios.request(options);
@@ -64,8 +64,8 @@ export default function Translation(props) {
       method: 'POST',
       url: 'https://google-translate113.p.rapidapi.com/api/v1/translator/text',
       headers: {
-        'x-rapidapi-key': 'c653844f29mshb76f19ec161e2c7p113f73jsncaafc098a089',
-        'x-rapidapi-host': 'google-translate113.p.rapidapi.com',
+        'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_GOOGLE_TRANSLATE_KEY,
+        'x-rapidapi-host': import.meta.env.VITE_RAPIDAPI_GOOGLE_TRANSLATE_HOST,
         'Content-Type': 'application/json'
       },
       data: {
