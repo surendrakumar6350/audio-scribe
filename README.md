@@ -40,6 +40,7 @@ npm run dev  # or yarn dev
 1. Upload an audio file or use the microphone for real-time transcription.
 2. The AI processes and converts the speech into text.
 3. Review, edit, and download the transcript.
+   
 
 ## 🤝 Contributing
 1. Fork the repository
